@@ -1,5 +1,9 @@
 {
     "files.associations": {
+        "nstack": "cpp",
+        "nqueue": "cpp",
+        "keywords": "plaintext",
+        "testcode": "plaintext",
         "array": "cpp",
         "cctype": "cpp",
         "clocale": "cpp",
@@ -84,6 +88,8 @@
         "syncstream": "cpp",
         "thread": "cpp",
         "typeindex": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "filesystem": "cpp",
+        "xhash": "cpp"
     }
 }
