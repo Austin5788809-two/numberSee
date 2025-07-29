@@ -11,22 +11,41 @@ struct node
     double value;
     vec weight;
 };
-class layer
+enum activate_func_t
 {
-private:
+    ReLU,
+    SIGMOD
+};
+struct layer
+{
     std::vector<node> nodes;
-    node bia;
+    node bias;
     layer* next;
     layer* prev;
-public:
+    activate_func_t act_f;
     layer(size_t s);
     size_t size(void);
     void set_value(const vec& v);
-    void connect(layer& l);
-    void output(vec& v);
-    void load(const char* file);
-    void save(const char* file);
-
-    friend void forward(layer& input);
+    void connect(layer* l);
 };
-
+class network
+{
+private:
+    std::vector<layer*> body;
+public:
+    network(std::vector<size_t> b);
+    ~network();
+    void input(const vec& in);
+    void output(vec& out);
+    void save_chromosome(vec& out);
+    void load_chromosome(int lnum, const std::vector<int>& nnum, const vec& in); // layer num, node num, input
+};
+class network_group
+{
+private:
+    std::vector<std::pair<double, vec>> units; // score, weights
+public:
+    network_group();
+    void test();
+    void cross();
+};

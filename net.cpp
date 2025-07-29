@@ -38,18 +38,18 @@ void layer::set_value(const vec& v)
     for (int i = 0; i < nodes.size(); i++)
         nodes[i].value = v[i];
 }
-void layer::connect(layer& l)
+void layer::connect(layer* l)
 {
-    l.prev = this;
-    next = &l;
+    l->prev = this;
+    next = l;
     for (auto& i : nodes)
     {
-        i.weight.resize(l.size());
+        i.weight.resize(l->size());
         i.connected = true;
         for (auto& j : i.weight)
             j = randfloat(-1, 1);
     }
-    bia.weight.resize(l.size());
-    for (auto& i : bia.weight)
+    bias.weight.resize(l->size());
+    for (auto& i : bias.weight)
         i = randfloat(-1, 1);
 }
