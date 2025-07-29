@@ -1,51 +1,32 @@
 // net.hpp
 #pragma once
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <cmath>
 #include <vector>
-#include <cstdlib>
-#include <ctime>
-#include <algorithm>
-#include <filesystem>
-#include <random>
-#include <unordered_map>
+typedef std::vector<double> vec;
 
-double randdouble(double l, double r)
-{
-    static thread_local std::mt19937_64 rng{std::random_device{}()};
-    if (l == r) return l;
-    if (l > r) std::swap(l, r);
-    constexpr double norm = 1.0 / (std::numeric_limits<double>::max() + 1.0);
-    double u = static_cast<double>(rng()) * norm;
-    return l + u * (r - l);
-}
-
+double randfloat(double l, double r);
+struct error_size_must_be_same{};
 struct node
 {
+    bool connected;
     double value;
-    std::unordered_map<node*, double, decltype([](const node* p){ return std::hash<const node*>{}(p); })> nxt_weight;
-    node() : value(0) {}
+    vec weight;
+};
+class layer
+{
+private:
+    std::vector<node> nodes;
+    node bia;
+    layer* next;
+    layer* prev;
+public:
+    layer(size_t s);
+    size_t size(void);
+    void set_value(const vec& v);
+    void connect(layer& l);
+    void output(vec& v);
+    void load(const char* file);
+    void save(const char* file);
+
+    friend void forward(layer& input);
 };
 
-struct layer
-{
-    size_t size;
-    std::vector<node*> nodes;
-    layer* next;
-    layer(size_t s) : size(s), next(nullptr)
-    {
-        nodes.resize(size + 1); // 最后一个是bia
-        for (size_t i = 0; i <= size; i++)
-            nodes[i] = new node;
-        nodes.back()->value = 1;
-    }
-    void connect(layer& nxt)
-    {
-        next = &nxt;
-        for (auto& i : nodes)
-            for (auto& j : nxt.nodes)
-                i->nxt_weight.insert{j, randdouble(-1, 1)};
-    }
-};

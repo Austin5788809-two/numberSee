@@ -90,6 +90,13 @@
         "typeindex": "cpp",
         "variant": "cpp",
         "filesystem": "cpp",
-        "xhash": "cpp"
+        "xhash": "cpp",
+        "buffer": "cpp",
+        "executor": "cpp",
+        "internet": "cpp",
+        "io_context": "cpp",
+        "netfwd": "cpp",
+        "socket": "cpp",
+        "timer": "cpp"
     }
 }
