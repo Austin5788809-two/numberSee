@@ -1,10 +1,11 @@
 // net.hpp
 #pragma once
 #include <vector>
+#include <stdexcept>
 typedef std::vector<double> vec;
 
 double randfloat(double l, double r);
-struct error_size_must_be_same{};
+struct error_size_must_be_same : public std::exception{};
 struct node
 {
     bool connected;
@@ -36,16 +37,20 @@ public:
     network(std::vector<size_t> b);
     ~network();
     void input(const vec& in);
+    void forward(layer* u);
     void output(vec& out);
-    void save_chromosome(vec& out);
+    void save_chromosome(int& lnum, std::vector<int>& nnum, vec& out);
     void load_chromosome(int lnum, const std::vector<int>& nnum, const vec& in); // layer num, node num, input
 };
 class network_group
 {
 private:
+    int lnum;
+    std::vector<int> nnum;
+    int totalnum;
     std::vector<std::pair<double, vec>> units; // score, weights
 public:
-    network_group();
+    network_group(int unum, int lnum, const std::vector<int>& nnum);
     void test();
     void cross();
 };
