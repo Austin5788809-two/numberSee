@@ -14,8 +14,8 @@ struct node
 };
 enum activate_func_t
 {
-    ReLU,
-    SIGMOD
+    RELU,
+    SIGMOID
 };
 struct layer
 {
@@ -23,7 +23,7 @@ struct layer
     node bias;
     layer* next;
     layer* prev;
-    activate_func_t act_f;
+    activate_func_t act_f = activate_func_t::SIGMOID;
     layer(size_t s);
     size_t size(void);
     void set_value(const vec& v);
@@ -38,19 +38,25 @@ public:
     ~network();
     void input(const vec& in);
     void forward(layer* u);
+    void forward();
     void output(vec& out);
-    void save_chromosome(int& lnum, std::vector<int>& nnum, vec& out);
-    void load_chromosome(int lnum, const std::vector<int>& nnum, const vec& in); // layer num, node num, input
+    void save_chromosome(int& lnum, std::vector<size_t>& nnum, vec& out);
+    void load_chromosome(int lnum, const std::vector<size_t>& nnum, const vec& in); // layer num, node num, input
 };
 class network_group
 {
 private:
+    double elite; // 分数，代表选取的比例
+    double mutate_rate; // 变异率
     int lnum;
-    std::vector<int> nnum;
+    std::vector<size_t> nnum;
     int totalnum;
     std::vector<std::pair<double, vec>> units; // score, weights
 public:
-    network_group(int unum, int lnum, const std::vector<int>& nnum);
+    network_group(double e, double m, int unum, int lnum, const std::vector<size_t>& nnum);
     void test();
     void cross();
+    void output(int& l, std::vector<size_t>& n, std::vector<vec>& u);
+    void save(const char* file);
+    void load(const char* file);
 };
