@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include <thread>
 #include <mutex>
+#include <numeric>
 
 std::mt19937 rng{std::random_device{}()};
 
