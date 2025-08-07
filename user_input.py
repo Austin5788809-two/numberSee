@@ -1,69 +1,52 @@
-import pygame
+# draw_once_30x30.py
 import numpy as np
-import os
+import pygame
+import sys
+
+GRID = 30          # 画布格子数
+CELL = 20          # 每格像素大小
+WIN  = GRID * CELL
 
 pygame.init()
-cell_size = 16
-matrix_size = 50
-canvas_size = matrix_size * cell_size
-
-screen = pygame.display.set_mode((canvas_size, canvas_size))
+screen = pygame.display.set_mode((WIN, WIN))
+pygame.display.set_caption("press Enter to finish")
 clock = pygame.time.Clock()
 
-def get_matrix(surface):
-    # 将pygame表面转换为numpy数组
-    arr = pygame.surfarray.array2d(surface)
-    mat = np.zeros((matrix_size, matrix_size), dtype=int)
+grid = np.zeros((GRID, GRID), dtype=np.uint8)   # 0/1 矩阵
+drawing = False
 
-    for i in range(matrix_size):
-        for j in range(matrix_size):
-            x = j * cell_size + cell_size // 2
-            y = i * cell_size + cell_size // 2
-            color = arr[x, y] & 0xFF  # 获取像素的亮度值
-            mat[i, j] = 1 if color < 128 else 0  # 阈值128区分黑白色
+def draw_canvas():
+    screen.fill((255, 255, 255))
+    for y in range(GRID):
+        for x in range(GRID):
+            if grid[y, x]:
+                rect = pygame.Rect(x * CELL, y * CELL, CELL, CELL)
+                pygame.draw.rect(screen, (0, 0, 0), rect)
+    pygame.display.flip()
 
-    return mat
+# 主循环
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+            # 保存
+            with open("user_input", "w") as f:
+                for row in grid:
+                    f.write(" ".join(map(str, row)) + "\n")
+            running = False
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            drawing = True
+        elif event.type == pygame.MOUSEBUTTONUP:
+            drawing = False
+        elif event.type == pygame.MOUSEMOTION and drawing:
+            mx, my = event.pos
+            x, y = mx // CELL, my // CELL
+            if 0 <= x < GRID and 0 <= y < GRID:
+                grid[y, x] = 1
+    draw_canvas()
+    clock.tick(120)
 
-def main():
-    drawing = False
-    screen.fill((255, 255, 255))  # 白色背景
-
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                return
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:  # 左键点击
-                    drawing = True
-            elif event.type == pygame.MOUSEBUTTONUP:
-                if event.button == 1:
-                    drawing = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:  # 按Enter键
-                    surface = pygame.display.get_surface().copy()
-                    mat = get_matrix(surface)
-
-                    # 保存矩阵到文件
-                    with open("input", "w") as f:
-                        for row in mat:
-                            f.write(" ".join(str(x) for x in row) + "\n")
-
-                    print("矩阵已保存到 input")
-                    pygame.quit()
-                    return
-
-        # 绘制逻辑
-        if drawing:
-            mx, my = pygame.mouse.get_pos()
-            gx, gy = mx // cell_size, my // cell_size
-            if 0 <= gx < matrix_size and 0 <= gy < matrix_size:
-                # 绘制黑色方块
-                pygame.draw.rect(screen, (0, 0, 0),
-                                (gx * cell_size, gy * cell_size, cell_size, cell_size))
-
-        pygame.display.flip()
-        clock.tick(60)
-
-if __name__ == "__main__":
-    main()
+pygame.quit()
+sys.exit()
