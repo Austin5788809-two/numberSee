@@ -1,14 +1,13 @@
 // train.cpp
 #include "net.hpp"
+#include <iostream>
+#include <fstream>
+#include <iomanip>
 
 int main()
 {
-    network_group agents(0.15, 0.02, 30, 3, {2500, 128, 10});
-    for (int i = 1; i <= 100; i++)
-    {
-        agents.test();
-        agents.cross();
-    }
-    agents.save("agents.txt");
+    network net(3, {900, 128, 10}, {RELU, RELU, SOFTMAX}, {{RELU, RELU, SOFTMAX}});
+    net.train("data");
+    net.save("network");
     return 0;
 }

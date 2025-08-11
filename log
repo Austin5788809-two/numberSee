@@ -1,0 +1,25 @@
+test.cpp: In function 'int main()':
+test.cpp:7:10: error: 'cout' is not a member of 'std'
+    7 |     std::cout << "starting input progam...\n";
+      |          ^~~~
+test.cpp:3:1: note: 'std::cout' is defined in header '<iostream>'; did you forget to '#include <iostream>'?
+    2 | #include "net.hpp"
+  +++ |+#include <iostream>
+    3 | 
+test.cpp:9:10: error: 'cout' is not a member of 'std'
+    9 |     std::cout << "computing...\n";
+      |          ^~~~
+test.cpp:9:10: note: 'std::cout' is defined in header '<iostream>'; did you forget to '#include <iostream>'?
+test.cpp:10:22: error: variable 'std::ifstream get' has initializer but incomplete type
+   10 |     std::ifstream get("user_input");
+      |                      ^
+test.cpp:17:14: error: 'cout' is not a member of 'std'
+   17 |         std::cout << std::fixed << std::setprecision(5) << i << " : " << res[i] << '\n';
+      |              ^~~~
+test.cpp:17:14: note: 'std::cout' is defined in header '<iostream>'; did you forget to '#include <iostream>'?
+test.cpp:17:27: error: 'fixed' is not a member of 'std'
+   17 |         std::cout << std::fixed << std::setprecision(5) << i << " : " << res[i] << '\n';
+      |                           ^~~~~
+test.cpp:17:41: error: 'setprecision' is not a member of 'std'
+   17 |         std::cout << std::fixed << std::setprecision(5) << i << " : " << res[i] << '\n';
+      |                                         ^~~~~~~~~~~~

@@ -1,4 +1,4 @@
-# draw_once_30x30.py
+# user_input.py
 import numpy as np
 import pygame
 import sys

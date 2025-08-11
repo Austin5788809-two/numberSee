@@ -13,6 +13,7 @@
 #include <thread>
 #include <mutex>
 #include <sstream>
+#include <iterator>
 
 std::mt19937 rng{std::random_device{}()};
 
@@ -60,6 +61,11 @@ network::network(size_t lnum, const std::vector<size_t>& nnum, std::vector<int> 
     }
     // 创建成功
     is_worked = true;
+}
+
+network::network(const char* filename)
+{
+    load(filename);
 }
 
 void active(std::vector<double>& value, int type) // 工具函数，激活一层
@@ -195,7 +201,7 @@ void network::backward(const std::vector<double>& input, const std::vector<doubl
     for (int l = (int)layer_number - 2; l >= 0; l--)
     {
         delta[l].assign(node_number[l], 0.0);
-        // δ_l[i] = Σ_j δ_{l+1}[j] * w_l[i][j] * σ'_l(z_l[i])
+        // δ[l][i] = Σ_j δ[l+1][j] * w_l[i][j] * σ'[l](z[l][i])
         for (size_t i = 0; i < node_number[l]; i++)
         {
             double sum = 0.0;
@@ -250,9 +256,9 @@ void network::save(const char* filename)
         for (int j = 0; j < node_number[i]; j++)
             putline(put, weight[i][j]);
     for (int i = 0; i < layer_number; i++)
-        putline(put, bias);
+        putline(put, bias[i]);
     for (int i = 0; i < layer_number; i++)
-        putline(put, value);
+        putline(put, value[i]);
     putline(put, act_f);
     putline(put, act_f_d);
     is_worked = true;
@@ -263,11 +269,11 @@ void getline(std::ifstream& get, std::vector<T>& v)
 {
     v.clear();
     std::string line;
-    std::getline(get, line);
-    std::istringstream ss(line);
-    std::copy(std::istream_iterator<T>(ss), std::istream_iterator<T>(), std::back_inserter(v));
+    if (!std::getline(get, line))
+        return;
+    std::istringstream iss(line);
+    std::copy(std::istream_iterator<T>(iss), std::istream_iterator<T>(), std::back_inserter(v));
 }
-
 void network::load(const char* filename)
 {
     is_worked = false;
@@ -281,9 +287,39 @@ void network::load(const char* filename)
         for (int j = 0; j < node_number[i]; j++)
             getline(get, weight[i][j]);
     for (int i = 0; i < layer_number; i++)
-        getline(get, bias);
+        getline(get, bias[i]);
     for (int i = 0; i < layer_number; i++)
-        getline(get, value);
+        getline(get, value[i]);
     getline(get, act_f);
     getline(get, act_f_d);
+    is_worked = true;
+}
+
+void network::train(const char* foldername)
+{
+    is_worked = false;
+    std::ifstream get;
+    int file_number = 0;
+    for (; ;)
+    {
+        get.open(foldername + std::string("/") + std::to_string(file_number++));
+        if (!get.is_open())
+            break;
+    }
+    if (!file_number)
+        return;
+    size_t label_size = node_number.back();
+    size_t data_size = node_number.front();
+    std::vector<double> label(label_size);
+    std::vector<double> data(data_size);
+    for (int filename = 0; filename < file_number; filename++)
+    {
+        std::cout << filename << '\n';
+        get.open(foldername + std::string("/") + std::to_string(filename));
+        for (int i = 0; i < label_size; i++)
+            get >> label[i];
+        for (int i = 0; i < data_size; i++)
+            get >> data[i];
+        backward(data, label);
+    }
 }
